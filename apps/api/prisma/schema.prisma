@@ -1,0 +1,101 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+enum Role {
+  SUPER_ADMIN
+  PLACEMENT_ADMIN
+  PLACEMENT_COORDINATOR
+  DEPARTMENT_COORDINATOR
+  RECRUITER
+  STUDENT
+}
+
+enum ApplicationStatus {
+  DRAFT
+  APPLIED
+  SHORTLISTED
+  IN_ASSESSMENT
+  INTERVIEW_SCHEDULED
+  INTERVIEW_COMPLETED
+  OFFER_EXTENDED
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  passwordHash   String
+  name           String
+  role           Role
+  isActive       Boolean   @default(true)
+  isVerified     Boolean   @default(false)
+  collegeId      String?
+  departmentId   String?
+  companyId      String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sessions       Session[]
+  auditLogs      AuditLog[]
+
+  @@index([role])
+  @@index([collegeId])
+  @@index([departmentId])
+  @@index([companyId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model StorageRecord {
+  id               String   @id @default(uuid())
+  fileKey          String   @unique
+  originalFilename String
+  mimeType         String
+  sizeBytes        BigInt
+  storageProvider  String   // 'local' | 'cloud'
+  storagePath      String
+  uploadedBy       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([fileKey])
+  @@index([uploadedBy])
+}

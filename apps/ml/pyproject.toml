@@ -1,0 +1,28 @@
+[project]
+name = "campus-placement-ml"
+version = "0.1.0"
+description = "AI/ML Service for AI-Powered Campus Placement Intelligence Platform"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.10.0",
+    "httpx>=0.28.1",
+    "scikit-learn>=1.6.0",
+    "xgboost>=2.1.0",
+    "sentence-transformers>=3.4.0",
+    "numpy>=2.0.0",
+    "pandas>=2.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

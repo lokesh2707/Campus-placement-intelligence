@@ -1,0 +1,21 @@
+{
+  "name": "@campus-os/validation",
+  "version": "0.1.0",
+  "description": "Shared Zod validation schemas for Campus Placement Platform",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@campus-os/shared-types": "*",
+    "@campus-os/config": "*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "rimraf": "^6.0.1"
+  }
+}

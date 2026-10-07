@@ -1,0 +1,127 @@
+services:
+  # ----------------------------------------------------------------------------
+  # Database: PostgreSQL 16 with pgvector extension (Native Vector Store)
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: campus_os_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-campus_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-campus_password}
+      POSTGRES_DB: ${POSTGRES_DB:-campus_placement}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-campus_user} -d ${POSTGRES_DB:-campus_placement}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # Cache & Messaging: Redis 7
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: campus_os_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ----------------------------------------------------------------------------
+  # Local AI Model Runner: Ollama (Zero Cost Local LLMs & Embeddings)
+  # ----------------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: campus_os_ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+  # ----------------------------------------------------------------------------
+  # AI/ML Microservice: Python FastAPI
+  # ----------------------------------------------------------------------------
+  ml:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.ml
+    container_name: campus_os_ml
+    restart: unless-stopped
+    ports:
+      - "${ML_PORT:-8000}:8000"
+    environment:
+      PYTHON_ENV: production
+      PORT: 8000
+      AI_PROVIDER: ${AI_PROVIDER:-ollama}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-all-MiniLM-L6-v2}
+    depends_on:
+      - ollama
+
+  # ----------------------------------------------------------------------------
+  # Backend API: Node.js Express + Prisma
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.api
+    container_name: campus_os_api
+    restart: unless-stopped
+    ports:
+      - "${PORT:-4000}:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campus_user}:${POSTGRES_PASSWORD:-campus_password}@postgres:5432/${POSTGRES_DB:-campus_placement}?schema=public
+      REDIS_URL: redis://redis:6379
+      REDIS_ENABLED: "true"
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev_access_secret_super_secure_key_campus_os_2026}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev_refresh_secret_super_secure_key_campus_os_2026}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      LOCAL_STORAGE_PATH: /app/uploads
+      ML_SERVICE_URL: http://ml:8000
+    volumes:
+      - api_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml:
+        condition: service_started
+
+  # ----------------------------------------------------------------------------
+  # Web Portal: Next.js Frontend
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.web
+    container_name: campus_os_web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_models:
+  api_uploads:
