@@ -6,7 +6,8 @@ export function sendSuccess<T>(
   data: T,
   statusCode = 200,
   message?: string,
-  meta?: PaginationMeta
+  meta?: PaginationMeta,
+  requestId?: string
 ): Response {
   const payload: ApiResponse<T> = {
     success: true,
@@ -14,6 +15,7 @@ export function sendSuccess<T>(
     message,
     data,
     meta,
+    requestId,
     timestamp: new Date().toISOString(),
   };
 
@@ -25,9 +27,10 @@ export function sendPaginated<T>(
   items: T[],
   meta: PaginationMeta,
   statusCode = 200,
-  message?: string
+  message?: string,
+  requestId?: string
 ): Response {
-  return sendSuccess(res, items, statusCode, message, meta);
+  return sendSuccess(res, items, statusCode, message, meta, requestId);
 }
 
 export function sendError(
@@ -35,7 +38,8 @@ export function sendError(
   statusCode: number,
   code: string,
   message: string,
-  details?: ApiErrorDetail[]
+  details?: ApiErrorDetail[],
+  requestId?: string
 ): Response {
   const payload: ApiErrorResponse = {
     success: false,
@@ -43,6 +47,7 @@ export function sendError(
     error: {
       code,
       message,
+      requestId,
       details,
     },
     timestamp: new Date().toISOString(),

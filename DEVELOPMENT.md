@@ -114,19 +114,33 @@ npm run typecheck
 npm run lint
 ```
 
-### 4.3 Running Unit Tests
+### 4.3 Running Unit Tests & Integration Tests
 ```bash
-# Run API & Storage & Response tests
-npm test
+# Run API tests
+npm test --workspace=@campus-os/api
 
-# Run all monorepo test suites
+# Run Web & Mobile tests
+npm test --workspace=@campus-os/web
+npm test --workspace=@campus-os/mobile
+
+# Run all TypeScript monorepo test suites
 npm run test:all
 ```
 
 ### 4.4 Running Python ML Tests
-In `apps/ml` with virtual environment activated:
+Using local Python:
+```bash
+npm run test:ml
+```
+Or inside `apps/ml` with virtual environment activated:
 ```bash
 pytest
+```
+
+### 4.5 Service Health Verification Script
+To verify connectivity across local endpoints concurrently:
+```bash
+npm run check:services
 ```
 
 ---

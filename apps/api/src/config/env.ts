@@ -6,6 +6,8 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(4000),
+  WEB_URL: z.string().default('http://localhost:3000'),
+  MOBILE_URL: z.string().default('http://localhost:8081'),
   CORS_ORIGIN: z.string().default('*'),
   DATABASE_URL: z.string().default('postgresql://campus_user:campus_password@localhost:5432/campus_placement?schema=public'),
   REDIS_URL: z.string().optional().default('redis://localhost:6379'),

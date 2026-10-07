@@ -13,6 +13,7 @@ export interface ApiResponse<T> {
   message?: string;
   data: T;
   meta?: PaginationMeta;
+  requestId?: string;
   timestamp: string;
 }
 
@@ -22,14 +23,17 @@ export interface ApiErrorDetail {
   code?: string;
 }
 
+export interface ApiError {
+  code: string;
+  message: string;
+  requestId?: string;
+  details?: ApiErrorDetail[];
+}
+
 export interface ApiErrorResponse {
   success: false;
   statusCode: number;
-  error: {
-    code: string;
-    message: string;
-    details?: ApiErrorDetail[];
-  };
+  error: ApiError;
   timestamp: string;
 }
 
@@ -39,4 +43,32 @@ export interface PaginationQuery {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   search?: string;
+}
+
+export interface ServiceHealth {
+  status: 'ok' | 'degraded' | 'error';
+  service: string;
+  timestamp: string;
+  version: string;
+}
+
+export interface ServiceReadiness {
+  status: 'ready' | 'not_ready';
+  service: string;
+  timestamp: string;
+  checks: {
+    database: {
+      status: 'connected' | 'disconnected';
+      latencyMs?: number;
+    };
+    redis: {
+      status: 'connected' | 'disconnected' | 'disabled';
+      latencyMs?: number;
+    };
+    mlService: {
+      status: 'available' | 'unavailable';
+      service?: string;
+      latencyMs?: number;
+    };
+  };
 }
