@@ -52,6 +52,10 @@ export const Permissions = {
 
   // AI Insights
   AI_REQUEST_INSIGHTS: 'ai:request_insights',
+
+  // Academic & Student Verification (Phase 3)
+  ACADEMIC_VERIFY: 'academic:verify',
+  SKILLS_MANAGE: 'skills:manage',
 } as const;
 
 export type Permission =
@@ -109,6 +113,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permissions.ANALYTICS_VIEW_COLLEGE,
     Permissions.AUDIT_LOGS_READ,
     Permissions.AI_REQUEST_INSIGHTS,
+    Permissions.ACADEMIC_VERIFY,
+    Permissions.SKILLS_MANAGE,
   ],
   [UserRole.PLACEMENT_ADMIN]: [
     Permissions.USER_READ_SELF,
@@ -136,6 +142,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permissions.ANALYTICS_VIEW_COLLEGE,
     Permissions.AUDIT_LOGS_READ,
     Permissions.AI_REQUEST_INSIGHTS,
+    Permissions.ACADEMIC_VERIFY,
+    Permissions.SKILLS_MANAGE,
   ],
   [UserRole.PLACEMENT_COORDINATOR]: [
     Permissions.USER_READ_SELF,
@@ -164,6 +172,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     Permissions.STUDENT_READ,
     Permissions.STUDENTS_DEPARTMENT_ONLY,
     'students:department_only',
+    Permissions.ACADEMIC_VERIFY,
     Permissions.DRIVE_READ,
     'drives:read',
     Permissions.ANALYTICS_READ,

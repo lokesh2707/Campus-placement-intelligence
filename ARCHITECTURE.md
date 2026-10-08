@@ -175,3 +175,46 @@ Resource Authorization (canAccessResource Owner / Admin Check)
   - Tokens are persisted via `secureStorage` adapter.
   - Universal `MobileApiClient` automatically intercepts 401 responses, executes token refresh, and replays requests without infinite loops.
   - `RootNavigator` seamlessly switches between Unauthenticated Stack (`Login`, `Register`, `ForgotPassword`) and Authenticated Stack based on `user.role`.
+
+---
+
+## 7. Student & Academic Management Architecture (Phase 3)
+
+### 7.1 Entity Relationship Model
+```text
+User (1) ──── (1) StudentProfile
+                     ├── College (N:1)
+                     ├── Department (N:1)
+                     ├── Degree (N:1)
+                     ├── Batch (N:1)
+                     ├── StudentSkill (1:N) ──── Skill (N:1)
+                     ├── StudentProject (1:N)
+                     ├── StudentInternship (1:N)
+                     ├── StudentCertification (1:N)
+                     ├── StudentCareerPreference (1:1)
+                     └── Resume (1:N)
+```
+
+### 7.2 Field Control & Verification Matrix
+
+| Domain Category | Specific Fields | Editable By | Verification State |
+|:---|:---|:---|:---|
+| **Identity & Auth** | `email`, `passwordHash`, `role`, `status` | User / Admin | Managed via Phase 2 Auth |
+| **Personal Info** | `bio`, `phone`, `profilePhoto`, `dateOfBirth`, `gender` | Student | Self-Managed |
+| **Academic Records** | `studentId`, `collegeId`, `departmentId`, `degreeId`, `batchId`, `graduationYear`, `cgpa`, `tenthPercentage`, `twelfthPercentage`, `diplomaPercentage`, `backlogs`, `activeBacklogs` | Institution Staff Only (Admin / Coordinator) | `PENDING` / `VERIFIED` / `REJECTED` |
+| **Skills** | `proficiency`, `yearsOfExperience` | Student (Taxonomy normalized) | Self-Managed |
+| **Projects & Experience** | Projects, Internships, Certifications | Student | Verification supported |
+| **Career Preferences** | Preferred Roles, Locations, Minimum Salary, Work Mode | Student | Self-Managed |
+| **Resumes** | Resume files, version numbers, active selection | Student | Private streaming |
+
+### 7.3 Deterministic Profile Completion Formula
+Profile completion is computed deterministically without AI/LLMs:
+- **Basic Information** (15%): Valid phone number and either bio or profile photo.
+- **Academic Information** (20%): Verified CGPA, 10th percentage, and 12th percentage populated.
+- **Skills Profile** (20%): At least 3 taxonomy skills added with proficiency levels.
+- **Projects Portfolio** (15%): At least 1 project added.
+- **Internships / Experience** (10%): At least 1 internship added.
+- **Certifications** (5%): At least 1 certification added.
+- **Active Resume** (15%): At least 1 active resume version uploaded.
+- **Total Score**: $\sum \text{Weights} = 100\%$.
+

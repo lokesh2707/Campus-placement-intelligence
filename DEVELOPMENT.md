@@ -191,3 +191,38 @@ This provisions accounts with Argon2id password hashes for `SUPER_ADMIN`, `PLACE
 
 ### 7.3 Zero-Cost Local Email Verification
 In local development, the platform uses `DevelopmentEmailProvider` which outputs simulated email verification and password reset links directly to the application console logger, storing them in memory for test access without requiring paid SMTP or external SaaS services.
+
+---
+
+## 8. Student & Academic Management (Phase 3)
+
+### 8.1 Domain Separation & Architecture
+The platform enforces strict separation between authentication and domain profiles:
+- `User`: Identity, authentication credentials, role, status, email verification.
+- `StudentProfile`: 1-to-1 relationship with `User`. Holds student registration number, academic metrics (CGPA, percentages, backlogs), and relations to skills, projects, internships, certifications, career preferences, and resumes.
+
+### 8.2 Academic Structure Hierarchy
+```text
+College (AIT)
+  ├── Campus (Main, North)
+  └── Department (CSE, ECE, EEE, MECH)
+        └── Degree (B.Tech CSE, B.Tech ECE, etc.)
+              └── Batch (Batch 2025, Batch 2026)
+                    └── StudentProfile
+```
+
+### 8.3 Ownership & Field Control Rules
+- **Student-Controlled Fields**: Students can edit their personal `phone`, `bio`, `profilePhoto`, `dateOfBirth`, `gender`, skills, projects, internships, certifications, career preferences, and resumes.
+- **Institution-Controlled Fields**: `studentId` (registration number), `collegeId`, `departmentId`, `degreeId`, `batchId`, `graduationYear`, `cgpa`, `tenthPercentage`, `twelfthPercentage`, `diplomaPercentage`, `backlogs`, `activeBacklogs`, and `verificationStatus`. Students cannot modify these fields; any payload attempts are discarded or rejected.
+- **Verification Workflow**: Placement administrators and department coordinators verify academic metrics (`PENDING`, `VERIFIED`, `REJECTED`).
+
+### 8.4 Department Coordinator Object-Level Authorization
+Department Coordinators are scoped to their assigned `departmentId`.
+- Coordinator queries (`/api/v1/admin/students`) are automatically forced to filter by `user.departmentId`.
+- Direct ID lookups or verification attempts against students outside their department return `403 FORBIDDEN`.
+
+### 8.5 Local File Storage & Private Resume Streams
+- Resumes are validated on the server (MIME types: PDF/DOC/DOCX, max 5 MB).
+- Uploaded via `LocalStorageProvider` to `./uploads/resumes/` with sanitized, cryptographically random names.
+- Public URLs are never exposed. Resumes are accessed only via authenticated streaming at `GET /api/v1/resumes/:id/download`, checking student ownership or administrator privileges.
+

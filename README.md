@@ -102,7 +102,7 @@ npm run db:seed
 - **Phase 0 (Complete)**: Architecture, Monorepo Foundation, Free-Tier Stack, Docker, Documentation & Initial Setup.
 - **Phase 1 (Complete)**: Development Foundation & Core Infrastructure (Layered API, Python FastAPI ML service, Next.js Web Shell, Expo Mobile Shell, Shared Packages, Request IDs, Structured Logging, Health & Readiness Checks, Resilient Redis/DB Handling, Test Suites).
 - **Phase 2 (Complete)**: Authentication, Identity & Role-Based Access Control (Argon2id password security, database-backed sessions, refresh token rotation, token reuse detection, email verification & password reset abstractions, audit logging, protected web routes & role-aware mobile navigation).
-- **Phase 3**: Student Profiles, Academic Details & Recruiter Company Management.
+- **Phase 3 (Complete)**: Student & Academic Management (Strict User/StudentProfile domain separation, academic structure [College, Campus, Department, Degree, Batch], normalized skills taxonomy, student skills, projects, internships, certifications, career preferences, local resume upload abstraction & private download streams, deterministic profile completion engine, institution-controlled field protection & academic verification workflows, department-scoped coordinator authorization, rich student dashboard on web & mobile, admin student directory with search/filters/pagination).
 - **Phase 4**: Placement Drive Creation, Job Postings, and Deterministic Eligibility Engine.
 - **Phase 5**: Student Applications, Multi-Stage Selection Pipeline & Live Interview Scheduling.
 - **Phase 6**: Offers, Placement Policies ("One Student One Job"), and Realtime Notifications.

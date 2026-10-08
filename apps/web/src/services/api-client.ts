@@ -118,9 +118,11 @@ export class ApiClient {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
+    const isFormData = typeof FormData !== 'undefined' && fetchOptions.body instanceof FormData;
+
     const reqHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
       Accept: 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(headers as Record<string, string>),
     };
 
@@ -193,6 +195,14 @@ export class ApiClient {
     return this.request<T>(path, {
       ...options,
       method: 'POST',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  }
+
+  put<T>(path: string, body?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(path, {
+      ...options,
+      method: 'PUT',
       body: body ? JSON.stringify(body) : undefined,
     });
   }
@@ -278,6 +288,137 @@ export class ApiClient {
 
   async revokeSession(sessionId: string) {
     return this.delete(`/api/v1/auth/sessions/${sessionId}`);
+  }
+
+  // --- Student Domain Methods ---
+
+  async getStudentProfile() {
+    return this.get<any>('/api/v1/students/me');
+  }
+
+  async createStudentProfile(data: any) {
+    return this.post<any>('/api/v1/students/profile', data);
+  }
+
+  async updateStudentProfile(data: any) {
+    return this.patch<any>('/api/v1/students/me', data);
+  }
+
+  async getTaxonomySkills(category?: string) {
+    return this.get<any[]>('/api/v1/skills', { params: { category } });
+  }
+
+  async addStudentSkill(data: { skillId: string; proficiency?: string; yearsOfExperience?: number }) {
+    return this.post<any>('/api/v1/students/me/skills', data);
+  }
+
+  async removeStudentSkill(skillId: string) {
+    return this.delete<void>(`/api/v1/students/me/skills/${skillId}`);
+  }
+
+  async getStudentProjects() {
+    return this.get<any[]>('/api/v1/students/me/projects');
+  }
+
+  async addStudentProject(data: any) {
+    return this.post<any>('/api/v1/students/me/projects', data);
+  }
+
+  async updateStudentProject(id: string, data: any) {
+    return this.patch<any>(`/api/v1/students/me/projects/${id}`, data);
+  }
+
+  async deleteStudentProject(id: string) {
+    return this.delete<void>(`/api/v1/students/me/projects/${id}`);
+  }
+
+  async getStudentInternships() {
+    return this.get<any[]>('/api/v1/students/me/internships');
+  }
+
+  async addStudentInternship(data: any) {
+    return this.post<any>('/api/v1/students/me/internships', data);
+  }
+
+  async deleteStudentInternship(id: string) {
+    return this.delete<void>(`/api/v1/students/me/internships/${id}`);
+  }
+
+  async getStudentCertifications() {
+    return this.get<any[]>('/api/v1/students/me/certifications');
+  }
+
+  async addStudentCertification(data: any) {
+    return this.post<any>('/api/v1/students/me/certifications', data);
+  }
+
+  async deleteStudentCertification(id: string) {
+    return this.delete<void>(`/api/v1/students/me/certifications/${id}`);
+  }
+
+  async getStudentPreferences() {
+    return this.get<any>('/api/v1/students/me/preferences');
+  }
+
+  async updateStudentPreferences(data: any) {
+    return this.put<any>('/api/v1/students/me/preferences', data);
+  }
+
+  async getStudentResumes() {
+    return this.get<any[]>('/api/v1/students/me/resumes');
+  }
+
+  async uploadResume(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.request<any>('/api/v1/students/me/resumes', {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  async setActiveResume(resumeId: string) {
+    return this.patch<any>(`/api/v1/students/me/resumes/${resumeId}/activate`);
+  }
+
+  async deleteResume(resumeId: string) {
+    return this.delete<void>(`/api/v1/students/me/resumes/${resumeId}`);
+  }
+
+  // --- Academic Structure Methods ---
+
+  async getColleges() {
+    return this.get<any[]>('/api/v1/colleges');
+  }
+
+  async getDepartments(collegeId: string) {
+    return this.get<any[]>('/api/v1/departments', { params: { collegeId } });
+  }
+
+  async getDegrees(departmentId: string) {
+    return this.get<any[]>('/api/v1/degrees', { params: { departmentId } });
+  }
+
+  async getBatches(degreeId: string) {
+    return this.get<any[]>('/api/v1/batches', { params: { degreeId } });
+  }
+
+  // --- Admin Student Management Methods ---
+
+  async getAdminStudents(params: any = {}) {
+    return this.get<any[]>('/api/v1/admin/students', { params });
+  }
+
+  async getAdminStudentById(id: string) {
+    return this.get<any>(`/api/v1/admin/students/${id}`);
+  }
+
+  async updateAdminStudent(id: string, data: any) {
+    return this.patch<any>(`/api/v1/admin/students/${id}`, data);
+  }
+
+  async verifyAdminStudent(id: string, status: string, notes?: string) {
+    return this.post<any>(`/api/v1/admin/students/${id}/verify`, { status, notes });
   }
 }
 

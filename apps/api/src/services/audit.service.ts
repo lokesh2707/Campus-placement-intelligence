@@ -14,6 +14,10 @@ export interface AuditEventParams {
 export class AuditService {
   constructor(private db: PrismaClient = prisma) {}
 
+  async log(params: AuditEventParams): Promise<void> {
+    return this.logEvent(params);
+  }
+
   /**
    * Asynchronously record a security or audit event.
    * Strips any sensitive properties such as password, token, or secret.

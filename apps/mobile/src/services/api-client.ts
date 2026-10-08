@@ -224,6 +224,41 @@ export class MobileApiClient {
   async getMe() {
     return this.get<{ user: MobileUser }>('/api/v1/auth/me');
   }
+
+  // --- Student Domain Calls ---
+
+  async getStudentProfile() {
+    return this.get<any>('/api/v1/students/me');
+  }
+
+  async updateStudentProfile(data: any) {
+    return this.patch<any>('/api/v1/students/me', data);
+  }
+
+  async getTaxonomySkills() {
+    return this.get<any[]>('/api/v1/skills');
+  }
+
+  async addStudentSkill(data: { skillId: string; proficiency?: string; yearsOfExperience?: number }) {
+    return this.post<any>('/api/v1/students/me/skills', data);
+  }
+
+  async removeStudentSkill(skillId: string) {
+    return this.delete<void>(`/api/v1/students/me/skills/${skillId}`);
+  }
+
+  async getStudentProjects() {
+    return this.get<any[]>('/api/v1/students/me/projects');
+  }
+
+  async getStudentResumes() {
+    return this.get<any[]>('/api/v1/students/me/resumes');
+  }
+
+  async setActiveResume(resumeId: string) {
+    return this.patch<any>(`/api/v1/students/me/resumes/${resumeId}/activate`);
+  }
 }
 
 export const mobileApi = new MobileApiClient();
+

@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { healthRouter } from '../health/health.routes.js';
 import { authRouter } from './auth.routes.js';
+import { academicRouter } from './academic.routes.js';
+import { studentRouter } from './student.routes.js';
+import { adminStudentRouter } from './admin-student.routes.js';
 import { API_VERSION } from '@campus-os/config';
 import { sendSuccess } from '../utils/response.js';
 
@@ -15,9 +18,15 @@ v1Router.get('/', (req, res) => {
       health: `/api/${API_VERSION}/health`,
       readiness: `/api/${API_VERSION}/health/ready`,
       auth: `/api/${API_VERSION}/auth`,
+      academic: `/api/${API_VERSION}/colleges`,
+      students: `/api/${API_VERSION}/students/me`,
+      adminStudents: `/api/${API_VERSION}/admin/students`,
     },
   }, 200, undefined, undefined, req.id);
 });
 
 v1Router.use('/health', healthRouter);
 v1Router.use('/auth', authRouter);
+v1Router.use('/', academicRouter);
+v1Router.use('/', studentRouter);
+v1Router.use('/', adminStudentRouter);
