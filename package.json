@@ -17,6 +17,7 @@
     "test:all": "npm run test --workspaces --if-present",
     "test:ml": "py -m pytest apps/ml",
     "check:services": "node scripts/check-services.js",
+    "db:seed": "npm run db:seed --workspace=@campus-os/api",
     "dev:api": "npm run dev --workspace=@campus-os/api",
     "dev:web": "npm run dev --workspace=@campus-os/web",
     "dev:mobile": "npm run start --workspace=@campus-os/mobile",

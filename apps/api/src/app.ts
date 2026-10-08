@@ -1,6 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { v1Router } from './routes/index.js';
 import { requestIdMiddleware } from './middleware/request-id.middleware.js';
 import { requestLoggerMiddleware } from './middleware/logger.middleware.js';
@@ -32,7 +33,8 @@ export function createApp(): express.Application {
   // 4. Rate limiting
   app.use(apiRateLimiter);
 
-  // 5. Body parsers with size limit
+  // 5. Body & Cookie parsers
+  app.use(cookieParser());
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 

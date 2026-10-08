@@ -1,5 +1,7 @@
 import { prisma } from '../config/database.js';
 
+export { prisma };
+
 export class HealthRepository {
   async pingDatabase(): Promise<{ status: 'connected' | 'disconnected'; latencyMs?: number }> {
     const start = Date.now();

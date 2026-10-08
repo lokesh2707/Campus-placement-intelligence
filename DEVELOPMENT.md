@@ -171,3 +171,23 @@ To verify that the local AI service operates without any paid keys:
    ```
 3. Check the ML service health status at `http://localhost:8000/health` or `http://localhost:8000/api/v1/models/status`.
 4. The service will report `ollama` as the active provider with `is_local: true`.
+
+---
+
+## 7. Authentication, RBAC & Database Seeding
+
+### 7.1 Running Database Seed (6 Roles)
+To populate local PostgreSQL with predefined development test accounts:
+```bash
+npm run db:seed
+```
+This provisions accounts with Argon2id password hashes for `SUPER_ADMIN`, `PLACEMENT_ADMIN`, `PLACEMENT_COORDINATOR`, `DEPARTMENT_COORDINATOR`, `RECRUITER`, and `STUDENT` with password `Password123!`.
+
+### 7.2 Authentication Token Lifecycle
+- **Access Tokens**: Short-lived (15 minutes), signed with `JWT_ACCESS_SECRET`. Contain `sub`, `email`, `role`, and `sessionId`.
+- **Refresh Tokens**: Cryptographically secure 40-byte random tokens stored as SHA-256 hashes in the `Session` table.
+- **Rotation**: Every call to `POST /api/v1/auth/refresh` invalidates the old refresh token and issues a new pair.
+- **Reuse Detection**: Presenting an already-revoked refresh token triggers automated session termination across all devices for that user.
+
+### 7.3 Zero-Cost Local Email Verification
+In local development, the platform uses `DevelopmentEmailProvider` which outputs simulated email verification and password reset links directly to the application console logger, storing them in memory for test access without requiring paid SMTP or external SaaS services.

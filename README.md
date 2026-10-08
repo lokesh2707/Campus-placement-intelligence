@@ -77,14 +77,23 @@ docker compose up -d
 
 ---
 
-## 👥 Supported User Roles
+## 👥 Supported User Roles & Development Seed Credentials
 
-1. `SUPER_ADMIN`: Institutional system administrator.
-2. `PLACEMENT_ADMIN`: Head of Placement & Training Department.
-3. `PLACEMENT_COORDINATOR`: Placement committee team member.
-4. `DEPARTMENT_COORDINATOR`: Faculty representative for specific academic departments.
-5. `RECRUITER`: Corporate recruitment partner.
-6. `STUDENT`: Registered graduating candidate.
+To populate your local PostgreSQL database with development accounts:
+```bash
+npm run db:seed
+```
+
+| Role | Development Email | Password | Access Level |
+|:---|:---|:---|:---|
+| `SUPER_ADMIN` | `superadmin@campus.edu` | `Password123!` | System configuration & all institutes |
+| `PLACEMENT_ADMIN` | `placementadmin@campus.edu` | `Password123!` | Placement head, policies & drives |
+| `PLACEMENT_COORDINATOR`| `placementcoord@campus.edu`| `Password123!` | Operational drives & interviews |
+| `DEPARTMENT_COORDINATOR`| `deptcoord@campus.edu` | `Password123!` | Department-specific students & data |
+| `RECRUITER` | `recruiter@techcorp.com` | `Password123!` | Job postings & candidate applications |
+| `STUDENT` | `student@campus.edu` | `Password123!` | Profile, applications & offers |
+
+> **Security Note:** Seed credentials are strictly for local development and are blocked in production environments (`NODE_ENV === 'production'`).
 
 ---
 
@@ -92,9 +101,10 @@ docker compose up -d
 
 - **Phase 0 (Complete)**: Architecture, Monorepo Foundation, Free-Tier Stack, Docker, Documentation & Initial Setup.
 - **Phase 1 (Complete)**: Development Foundation & Core Infrastructure (Layered API, Python FastAPI ML service, Next.js Web Shell, Expo Mobile Shell, Shared Packages, Request IDs, Structured Logging, Health & Readiness Checks, Resilient Redis/DB Handling, Test Suites).
-- **Phase 2**: Authentication, User Sessions, Profile Management & Core Multi-Tenancy.
-- **Phase 3**: Placement Drive Creation, Job Postings, and Deterministic Eligibility Engine.
-- **Phase 4**: Student Applications, Multi-Stage Selection Pipeline & Live Interview Scheduling.
-- **Phase 5**: Offers, Placement Policies ("One Student One Job"), and Realtime Notifications.
-- **Phase 6**: Local-First AI Resume Parsing, Semantic Job Matching & Placement Readiness Prediction.
-- **Phase 7**: Analytics Dashboards, Audit Logs, and Mobile Polish.
+- **Phase 2 (Complete)**: Authentication, Identity & Role-Based Access Control (Argon2id password security, database-backed sessions, refresh token rotation, token reuse detection, email verification & password reset abstractions, audit logging, protected web routes & role-aware mobile navigation).
+- **Phase 3**: Student Profiles, Academic Details & Recruiter Company Management.
+- **Phase 4**: Placement Drive Creation, Job Postings, and Deterministic Eligibility Engine.
+- **Phase 5**: Student Applications, Multi-Stage Selection Pipeline & Live Interview Scheduling.
+- **Phase 6**: Offers, Placement Policies ("One Student One Job"), and Realtime Notifications.
+- **Phase 7**: Local-First AI Resume Parsing, Semantic Job Matching & Placement Readiness Prediction.
+- **Phase 8**: Analytics Dashboards, Audit Logs, and Mobile Polish.

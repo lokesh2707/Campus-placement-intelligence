@@ -11,13 +11,20 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@campus-os/config": "*",
     "@campus-os/shared-types": "*",
     "@campus-os/validation": "*",
     "@prisma/client": "^6.4.1",
+    "@types/cookie-parser": "^1.4.10",
+    "argon2": "^0.45.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

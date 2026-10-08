@@ -18,70 +18,123 @@ enum Role {
   STUDENT
 }
 
-enum ApplicationStatus {
-  DRAFT
-  APPLIED
-  SHORTLISTED
-  IN_ASSESSMENT
-  INTERVIEW_SCHEDULED
-  INTERVIEW_COMPLETED
-  OFFER_EXTENDED
-  OFFER_ACCEPTED
-  OFFER_REJECTED
-  REJECTED
-  WITHDRAWN
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum AuditEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  LOGOUT_ALL
+  PASSWORD_CHANGED
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
+  EMAIL_VERIFIED
+  EMAIL_VERIFICATION_REQUESTED
+  SESSION_CREATED
+  SESSION_REVOKED
+  TOKEN_REFRESH_SUCCESS
+  TOKEN_REFRESH_REUSE_DETECTED
+  USER_REGISTERED
 }
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
-  passwordHash   String
-  name           String
-  role           Role
-  isActive       Boolean   @default(true)
-  isVerified     Boolean   @default(false)
-  collegeId      String?
-  departmentId   String?
-  companyId      String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String      @id @default(uuid())
+  email         String      @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  role          Role        @default(STUDENT)
+  status        UserStatus  @default(PENDING_VERIFICATION)
+  emailVerified Boolean     @default(false)
+  lastLoginAt   DateTime?
+  collegeId     String?
+  departmentId  String?
+  companyId     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
 
-  sessions       Session[]
-  auditLogs      AuditLog[]
+  sessions                Session[]
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  auditLogs               AuditLog[]
 
+  @@index([email])
   @@index([role])
+  @@index([status])
   @@index([collegeId])
   @@index([departmentId])
   @@index([companyId])
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  refreshToken String   @unique
-  userAgent    String?
-  ipAddress    String?
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String    @unique
+  userAgent        String?
+  ipAddress        String?
+  createdAt        DateTime  @default(now())
+  lastUsedAt       DateTime  @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  revokedReason    String?
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([refreshTokenHash])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
 }
 
 model AuditLog {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   userId    String?
-  action    String
-  entity    String
-  entityId  String?
-  details   Json?
+  event     AuditEventType
+  requestId String?
   ipAddress String?
-  createdAt DateTime @default(now())
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userAgent String?
+  metadata  Json?
+  timestamp DateTime       @default(now())
+
+  user      User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
-  @@index([entity, entityId])
-  @@index([createdAt])
+  @@index([event])
+  @@index([timestamp])
 }
 
 model StorageRecord {

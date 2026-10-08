@@ -130,3 +130,48 @@ A foundational constraint governing this entire architecture is **₹0 mandatory
   - `api` (4000)
   - `web` (3000)
 - **Zero Cloud Cost Guarantee**: Complete system functions out-of-the-box on a laptop with 8GB-16GB RAM without any internet connection or cloud billing account.
+
+---
+
+## 6. Authentication, Identity & RBAC Architecture
+
+### 6.1 Authentication Hierarchy
+```text
+User
+ ↓
+Authentication (Argon2id Password Verification)
+ ↓
+Session (Database-Backed with Secure Refresh Hash)
+ ↓
+Access Token (15-Minute Short-Lived JWT)
+ ↓
+Authorization (requireAuth + requireRole + requirePermission)
+ ↓
+Resource Authorization (canAccessResource Owner / Admin Check)
+```
+
+### 6.2 Token Strategy
+- **JWT Access Token**: Signed with HMAC SHA-256 (`JWT_ACCESS_SECRET`). Claims: `sub`, `userId`, `email`, `role`, `sessionId`, `collegeId`. Expiration: 15 minutes.
+- **Refresh Token**: 40-byte cryptographically secure random token generated on the server. Stored in database exclusively as a SHA-256 hash. Expiration: 7 days.
+- **Token Rotation**: Every refresh request rotates the token. If an attacker presents an already-rotated or revoked token, token reuse detection immediately triggers revocation of all active sessions for that user family.
+
+### 6.3 Fine-Grained Role & Permission Model
+- Roles: `SUPER_ADMIN`, `PLACEMENT_ADMIN`, `PLACEMENT_COORDINATOR`, `DEPARTMENT_COORDINATOR`, `RECRUITER`, `STUDENT`.
+- Permission Matrix (`ROLE_PERMISSIONS` in `@campus-os/config`):
+  - Self management: `USER_READ_SELF`, `USER_UPDATE_SELF`
+  - Student operations: `STUDENT_READ`, `STUDENT_UPDATE`, `STUDENT_MANAGE`, `STUDENTS_DEPARTMENT_ONLY`
+  - Company operations: `COMPANY_CREATE`, `COMPANY_READ`, `COMPANY_UPDATE`, `COMPANIES_MANAGE`, `RECRUITERS_MANAGE`
+  - Drive operations: `DRIVE_CREATE`, `DRIVE_READ`, `DRIVE_UPDATE`, `DRIVES_MANAGE`
+  - Application operations: `APPLICATION_READ`, `APPLICATION_UPDATE`, `APPLICATIONS_SUBMIT`, `APPLICATIONS_VIEW_OWN`, `APPLICATIONS_MANAGE`
+  - Interview & Offer operations: `INTERVIEWS_SCHEDULE`, `INTERVIEWS_VIEW_OWN`, `INTERVIEWS_FEEDBACK`, `OFFERS_ISSUE`, `OFFERS_VIEW_OWN`
+  - Administrative oversight: `ADMIN_MANAGE_USERS`, `SYSTEM_MANAGE`, `COLLEGES_MANAGE`, `DEPARTMENTS_MANAGE`, `ANALYTICS_READ`, `AUDIT_LOGS_READ`
+
+### 6.4 Web & Mobile Client Authentication Flows
+- **Web App (Next.js)**:
+  - `AuthProvider` maintains in-memory authentication state and restores session via `GET /api/v1/auth/me`.
+  - Refresh tokens are transmitted via `httpOnly` secure cookies or response JSON.
+  - Route guards (`ProtectedRoute`) verify authentication state and role eligibility before rendering children.
+- **Mobile App (React Native / Expo)**:
+  - Tokens are persisted via `secureStorage` adapter.
+  - Universal `MobileApiClient` automatically intercepts 401 responses, executes token refresh, and replays requests without infinite loops.
+  - `RootNavigator` seamlessly switches between Unauthenticated Stack (`Login`, `Register`, `ForgotPassword`) and Authenticated Stack based on `user.role`.
