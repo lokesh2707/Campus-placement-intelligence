@@ -65,6 +65,29 @@ export enum AuditEventType {
   SKILL_UPDATED = 'SKILL_UPDATED',
   RESUME_UPLOADED = 'RESUME_UPLOADED',
   RESUME_DELETED = 'RESUME_DELETED',
+  // Phase 4 Company & Recruiter Events
+  COMPANY_CREATED = 'COMPANY_CREATED',
+  COMPANY_UPDATED = 'COMPANY_UPDATED',
+  COMPANY_DELETED = 'COMPANY_DELETED',
+  COMPANY_VERIFICATION_SUBMITTED = 'COMPANY_VERIFICATION_SUBMITTED',
+  COMPANY_VERIFIED = 'COMPANY_VERIFIED',
+  COMPANY_REJECTED = 'COMPANY_REJECTED',
+  COMPANY_SUSPENDED = 'COMPANY_SUSPENDED',
+  COMPANY_ACTIVATED = 'COMPANY_ACTIVATED',
+  RECRUITER_INVITED = 'RECRUITER_INVITED',
+  RECRUITER_CREATED = 'RECRUITER_CREATED',
+  RECRUITER_UPDATED = 'RECRUITER_UPDATED',
+  RECRUITER_VERIFIED = 'RECRUITER_VERIFIED',
+  RECRUITER_SUSPENDED = 'RECRUITER_SUSPENDED',
+  RECRUITER_ACTIVATED = 'RECRUITER_ACTIVATED',
+  COMPANY_DOCUMENT_UPLOADED = 'COMPANY_DOCUMENT_UPLOADED',
+  COMPANY_DOCUMENT_VERIFIED = 'COMPANY_DOCUMENT_VERIFIED',
+  COMPANY_DOCUMENT_REJECTED = 'COMPANY_DOCUMENT_REJECTED',
+  COMPANY_DOCUMENT_DELETED = 'COMPANY_DOCUMENT_DELETED',
+  COMPANY_CONTACT_CREATED = 'COMPANY_CONTACT_CREATED',
+  COMPANY_CONTACT_UPDATED = 'COMPANY_CONTACT_UPDATED',
+  COMPANY_CONTACT_DELETED = 'COMPANY_CONTACT_DELETED',
+  COMPANY_PREFERENCES_UPDATED = 'COMPANY_PREFERENCES_UPDATED',
 }
 
 export interface AuditLogDTO {
@@ -296,4 +319,169 @@ export interface StudentProfileDTO extends BaseEntity {
   careerPreferences?: StudentCareerPreferenceDTO | null;
   resumes?: ResumeDTO[];
   profileCompletion?: ProfileCompletionBreakdown;
+}
+
+export enum CompanyType {
+  STARTUP = 'STARTUP',
+  SMALL_BUSINESS = 'SMALL_BUSINESS',
+  MEDIUM_BUSINESS = 'MEDIUM_BUSINESS',
+  ENTERPRISE = 'ENTERPRISE',
+  MNC = 'MNC',
+  GOVERNMENT = 'GOVERNMENT',
+  NGO = 'NGO',
+  OTHER = 'OTHER',
+}
+
+export enum CompanySize {
+  MICRO = 'MICRO',
+  SMALL = 'SMALL',
+  MEDIUM = 'MEDIUM',
+  LARGE = 'LARGE',
+  ENTERPRISE = 'ENTERPRISE',
+}
+
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export enum CompanyVerificationStatus {
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
+export enum RecruiterStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum RecruiterVerificationStatus {
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
+export enum CompanyContactType {
+  HR = 'HR',
+  RECRUITMENT = 'RECRUITMENT',
+  TECHNICAL = 'TECHNICAL',
+  FINANCE = 'FINANCE',
+  LEGAL = 'LEGAL',
+  OTHER = 'OTHER',
+}
+
+export enum CompanyDocumentType {
+  REGISTRATION_CERTIFICATE = 'REGISTRATION_CERTIFICATE',
+  COMPANY_PAN = 'COMPANY_PAN',
+  GST_CERTIFICATE = 'GST_CERTIFICATE',
+  AUTHORIZATION_LETTER = 'AUTHORIZATION_LETTER',
+  OTHER = 'OTHER',
+}
+
+export enum DocumentVerificationStatus {
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+
+export interface CompanyContactDTO extends BaseEntity {
+  companyId: string;
+  name: string;
+  designation?: string | null;
+  email: string;
+  phone?: string | null;
+  contactType: CompanyContactType;
+  isPrimary: boolean;
+}
+
+export interface CompanyDocumentDTO extends BaseEntity {
+  companyId: string;
+  documentType: CompanyDocumentType;
+  fileReference: string;
+  fileName: string;
+  mimeType: string;
+  fileSize: number | bigint;
+  uploadedById: string;
+  verificationStatus: DocumentVerificationStatus;
+  verificationNotes?: string | null;
+  verifiedAt?: Date | string | null;
+  verifiedById?: string | null;
+  uploadedBy?: UserDTO;
+}
+
+export interface CompanyHiringPreferenceDTO extends BaseEntity {
+  companyId: string;
+  preferredDepartments: string[];
+  preferredDegrees: string[];
+  preferredSkills: string[];
+  preferredLocations: string[];
+  preferredWorkModes: WorkPreference[];
+  minimumCgpa?: number | null;
+  maximumBacklogs?: number | null;
+  preferredGraduationYears: number[];
+}
+
+export interface RecruiterProfileDTO extends BaseEntity {
+  userId: string;
+  companyId: string;
+  designation?: string | null;
+  department?: string | null;
+  employeeId?: string | null;
+  workEmail?: string | null;
+  workPhone?: string | null;
+  profilePhoto?: string | null;
+  status: RecruiterStatus;
+  verificationStatus: RecruiterVerificationStatus;
+  verificationNotes?: string | null;
+  verifiedAt?: Date | string | null;
+  verifiedById?: string | null;
+  user?: UserDTO;
+  company?: CompanyDTO;
+}
+
+export interface RecruiterInvitationDTO extends BaseEntity {
+  companyId: string;
+  email: string;
+  tokenHash: string;
+  role: UserRole;
+  designation?: string | null;
+  invitedById: string;
+  isAccepted: boolean;
+  acceptedAt?: Date | string | null;
+  expiresAt: Date | string;
+  company?: CompanyDTO;
+  invitedBy?: UserDTO;
+}
+
+export interface CompanyDTO extends BaseEntity {
+  name: string;
+  legalName?: string | null;
+  slug: string;
+  description?: string | null;
+  industry: string;
+  companyType: CompanyType;
+  website?: string | null;
+  logoUrl?: string | null;
+  headquarters?: string | null;
+  foundedYear?: number | null;
+  companySize: CompanySize;
+  linkedinUrl?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  status: CompanyStatus;
+  verificationStatus: CompanyVerificationStatus;
+  verificationNotes?: string | null;
+  verifiedAt?: Date | string | null;
+  verifiedById?: string | null;
+  deletedAt?: Date | string | null;
+
+  recruiters?: RecruiterProfileDTO[];
+  contacts?: CompanyContactDTO[];
+  documents?: CompanyDocumentDTO[];
+  hiringPreference?: CompanyHiringPreferenceDTO | null;
 }

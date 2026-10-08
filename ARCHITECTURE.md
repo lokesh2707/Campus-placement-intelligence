@@ -218,3 +218,39 @@ Profile completion is computed deterministically without AI/LLMs:
 - **Active Resume** (15%): At least 1 active resume version uploaded.
 - **Total Score**: $\sum \text{Weights} = 100\%$.
 
+---
+
+## 8. Company & Recruiter Management Architecture (Phase 4)
+
+### 8.1 Entity Relationship Model
+```text
+Company (1) ──── (N) RecruiterProfile (1) ──── (1) User
+   │
+   ├── (N) RecruiterInvitation
+   ├── (N) CompanyContact
+   ├── (N) CompanyDocument
+   └── (1) CompanyHiringPreference
+```
+
+### 8.2 Object-Level Authorization Rules
+- **Super Admins & Placement Admins**: Full management access across all companies, recruiter assignments, document verification, and operational statuses (`ACTIVE`, `SUSPENDED`, `INACTIVE`).
+- **Placement Coordinators**: Operational visibility and management across verified companies and contacts.
+- **Department Coordinators**: Read-only directory access to verified companies and public hiring preferences for student advisement.
+- **Recruiters**: Restricted strictly to their own bound `companyId`. A recruiter attempting to read, update, or upload documents for another company receives an immediate `403 Forbidden` response.
+- **Suspended Recruiters / Companies**: Access immediately denied across all private endpoints upon status mutation.
+
+### 8.3 Recruiter Invitation & Onboarding Lifecycle
+1. **Admin or Authorized Recruiter** triggers invitation (`POST /api/v1/companies/:id/recruiters/invite`).
+2. System checks for email uniqueness within company, generates 32-byte cryptographically secure random token, stores SHA-256 hash in `RecruiterInvitation`, sets 7-day expiration.
+3. System sends simulated/SMTP invitation email with activation link.
+4. Recruiter accesses web portal (`POST /api/v1/recruiters/accept-invite`):
+   - New user: Creates `User` with Argon2id hashed password and binds `RecruiterProfile`.
+   - Existing user: Binds or updates `companyId` and `RecruiterProfile`.
+   - Invalidates invitation token (`isAccepted = true`).
+
+### 8.4 Company Compliance & Verification States
+- `CompanyVerificationStatus`: `PENDING` -> `VERIFIED` / `REJECTED` / `REQUIRES_UPDATE`.
+- `CompanyStatus`: `ACTIVE`, `SUSPENDED`, `INACTIVE`.
+- Documents: Strict whitelist (PDF, DOC, DOCX, JPEG, PNG), max 5 MB, stored via `IStorageService` on local filesystem (`./uploads/company-docs/`) with randomized UUID names to prevent path traversal and execution.
+- Logos: Max 2 MB image whitelist, served safely.
+

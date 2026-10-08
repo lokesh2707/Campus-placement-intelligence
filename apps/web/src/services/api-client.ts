@@ -199,6 +199,14 @@ export class ApiClient {
     });
   }
 
+  postFormData<T>(path: string, formData: FormData, options?: RequestOptions): Promise<ApiResponse<T>> {
+    return this.request<T>(path, {
+      ...options,
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   put<T>(path: string, body?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
     return this.request<T>(path, {
       ...options,
@@ -419,6 +427,151 @@ export class ApiClient {
 
   async verifyAdminStudent(id: string, status: string, notes?: string) {
     return this.post<any>(`/api/v1/admin/students/${id}/verify`, { status, notes });
+  }
+
+  // --- Company & Employer Methods ---
+
+  async getCompanies(params: any = {}) {
+    return this.get<any[]>('/api/v1/companies', { params });
+  }
+
+  async getCompanyById(id: string) {
+    return this.get<any>(`/api/v1/companies/${id}`);
+  }
+
+  async createCompany(data: any) {
+    return this.post<any>('/api/v1/companies', data);
+  }
+
+  async updateCompany(id: string, data: any) {
+    return this.patch<any>(`/api/v1/companies/${id}`, data);
+  }
+
+  async deleteCompany(id: string) {
+    return this.delete<any>(`/api/v1/companies/${id}`);
+  }
+
+  async verifyCompany(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/companies/${id}/verify`, { status: 'VERIFIED', notes });
+  }
+
+  async rejectCompany(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/companies/${id}/reject`, { status: 'REJECTED', notes });
+  }
+
+  async suspendCompany(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/companies/${id}/suspend`, { notes });
+  }
+
+  async activateCompany(id: string) {
+    return this.post<any>(`/api/v1/companies/${id}/activate`, {});
+  }
+
+  async uploadCompanyLogo(id: string, file: File) {
+    const formData = new FormData();
+    formData.append('logo', file);
+    return this.postFormData<any>(`/api/v1/companies/${id}/logo`, formData);
+  }
+
+  // --- Company Contacts ---
+
+  async getCompanyContacts(companyId: string) {
+    return this.get<any[]>(`/api/v1/companies/${companyId}/contacts`);
+  }
+
+  async createCompanyContact(companyId: string, data: any) {
+    return this.post<any>(`/api/v1/companies/${companyId}/contacts`, data);
+  }
+
+  async updateCompanyContact(companyId: string, contactId: string, data: any) {
+    return this.patch<any>(`/api/v1/companies/${companyId}/contacts/${contactId}`, data);
+  }
+
+  async deleteCompanyContact(companyId: string, contactId: string) {
+    return this.delete<any>(`/api/v1/companies/${companyId}/contacts/${contactId}`);
+  }
+
+  // --- Company Documents ---
+
+  async getCompanyDocuments(companyId: string) {
+    return this.get<any[]>(`/api/v1/companies/${companyId}/documents`);
+  }
+
+  async uploadCompanyDocument(companyId: string, file: File, documentType: string) {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('documentType', documentType);
+    return this.postFormData<any>(`/api/v1/companies/${companyId}/documents`, formData);
+  }
+
+  async verifyCompanyDocument(companyId: string, documentId: string, notes?: string) {
+    return this.post<any>(`/api/v1/companies/${companyId}/documents/${documentId}/verify`, {
+      status: 'VERIFIED',
+      notes,
+    });
+  }
+
+  async rejectCompanyDocument(companyId: string, documentId: string, notes?: string) {
+    return this.post<any>(`/api/v1/companies/${companyId}/documents/${documentId}/reject`, {
+      status: 'REJECTED',
+      notes,
+    });
+  }
+
+  async deleteCompanyDocument(companyId: string, documentId: string) {
+    return this.delete<any>(`/api/v1/companies/${companyId}/documents/${documentId}`);
+  }
+
+  // --- Company Hiring Preferences ---
+
+  async getCompanyPreferences(companyId: string) {
+    return this.get<any>(`/api/v1/companies/${companyId}/preferences`);
+  }
+
+  async updateCompanyPreferences(companyId: string, data: any) {
+    return this.patch<any>(`/api/v1/companies/${companyId}/preferences`, data);
+  }
+
+  // --- Recruiter Methods ---
+
+  async getRecruiterMe() {
+    return this.get<{ profile: any; company: any }>('/api/v1/recruiters/me');
+  }
+
+  async updateRecruiterMe(data: any) {
+    return this.patch<any>('/api/v1/recruiters/me', data);
+  }
+
+  async getRecruiters(params: any = {}) {
+    return this.get<any[]>('/api/v1/recruiters', { params });
+  }
+
+  async getRecruiterById(id: string) {
+    return this.get<any>(`/api/v1/recruiters/${id}`);
+  }
+
+  async inviteRecruiter(companyId: string, data: { email: string; designation?: string }) {
+    return this.post<any>(`/api/v1/companies/${companyId}/recruiters/invite`, data);
+  }
+
+  async acceptRecruiterInvitation(data: any) {
+    return this.post<any>('/api/v1/recruiters/accept-invitation', data);
+  }
+
+  async verifyRecruiter(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/recruiters/${id}/verify`, { status: 'VERIFIED', notes });
+  }
+
+  async rejectRecruiter(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/recruiters/${id}/reject`, { status: 'REJECTED', notes });
+  }
+
+  async suspendRecruiter(id: string, notes?: string) {
+    return this.post<any>(`/api/v1/recruiters/${id}/suspend`, { notes });
+  }
+
+  async activateRecruiter(id: string) {
+    return this.post<any>(`/api/v1/recruiters/${id}/activate`, {});
   }
 }
 

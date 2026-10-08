@@ -6,3 +6,6 @@ export * from './development.provider.js';
 
 // Default to DevelopmentEmailProvider for zero mandatory cost
 export const emailService: DevelopmentEmailProvider = new DevelopmentEmailProvider();
+export function getEmailService(): IEmailService {
+  return emailService;
+}

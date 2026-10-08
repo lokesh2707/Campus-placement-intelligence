@@ -258,6 +258,28 @@ export class MobileApiClient {
   async setActiveResume(resumeId: string) {
     return this.patch<any>(`/api/v1/students/me/resumes/${resumeId}/activate`);
   }
+
+  // --- Recruiter Domain Calls (Phase 4) ---
+
+  async getRecruiterMe() {
+    return this.get<{ profile: any; company: any }>('/api/v1/recruiters/me');
+  }
+
+  async getCompanyDetails(companyId: string) {
+    return this.get<any>(`/api/v1/companies/${companyId}`);
+  }
+
+  async getCompanyContacts(companyId: string) {
+    return this.get<any[]>(`/api/v1/companies/${companyId}/contacts`);
+  }
+
+  async getCompanyPreferences(companyId: string) {
+    return this.get<any>(`/api/v1/companies/${companyId}/preferences`);
+  }
+
+  async getCompanyDocuments(companyId: string) {
+    return this.get<any[]>(`/api/v1/companies/${companyId}/documents`);
+  }
 }
 
 export const mobileApi = new MobileApiClient();

@@ -226,3 +226,27 @@ Department Coordinators are scoped to their assigned `departmentId`.
 - Uploaded via `LocalStorageProvider` to `./uploads/resumes/` with sanitized, cryptographically random names.
 - Public URLs are never exposed. Resumes are accessed only via authenticated streaming at `GET /api/v1/resumes/:id/download`, checking student ownership or administrator privileges.
 
+---
+
+## 9. Company & Recruiter Management (Phase 4)
+
+### 9.1 Domain Architecture & Object-Level Access Control
+- `Company`: Holds corporate information, unique slug, status (`ACTIVE`, `SUSPENDED`, `INACTIVE`), verification status (`PENDING`, `VERIFIED`, `REJECTED`), and soft-delete timestamp.
+- `RecruiterProfile`: 1-to-1 relationship with `User` and N-to-1 with `Company`. Holds designation, status, and verification state.
+- **Access Rule**: Recruiters can only access or modify the company bound to their `recruiterProfile.companyId`. Direct manipulation of other companies is rejected with `403 Forbidden`.
+
+### 9.2 Recruiter Invitation Flow
+- Admins or verified company recruiters send invites via `POST /api/v1/companies/:id/recruiters/invite`.
+- A 32-byte cryptographic random token is generated; its SHA-256 hash is saved in `RecruiterInvitation`.
+- The recruiter opens the invite link (`/auth/recruiter-invite?token=...`) and registers or accepts via `POST /api/v1/recruiters/accept-invite`.
+
+### 9.3 Company Contacts & Compliance Documents
+- **Contacts**: Supports `HR`, `PRIMARY`, `TECHNICAL`, `CAMPUS_LEAD`, and `FINANCE` contact types with primary designation flagging.
+- **Documents**: Allows uploading certificates of incorporation, tax registrations, or company policy PDFs (max 5 MB). Uploads go through `IStorageService` into `./uploads/company-docs/` with private download streaming at `GET /api/v1/companies/:id/documents/:docId/download`.
+- **Logos**: Scaled and validated image files (max 2 MB) saved to `./uploads/company-logos/`.
+
+### 9.4 Verification & Suspension Workflows
+- Placement Administrators verify corporate paperwork via `POST /api/v1/companies/:id/verify`.
+- Admins can suspend or reactivate companies via `POST /api/v1/companies/:id/suspend` and `POST /api/v1/companies/:id/activate`.
+- All operational transitions emit audit logs (`COMPANY_VERIFIED`, `COMPANY_SUSPENDED`, `RECRUITER_INVITED`, etc.).
+

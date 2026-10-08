@@ -50,6 +50,74 @@ enum WorkPreference {
   ANY
 }
 
+enum CompanyType {
+  STARTUP
+  SMALL_BUSINESS
+  MEDIUM_BUSINESS
+  ENTERPRISE
+  MNC
+  GOVERNMENT
+  NGO
+  OTHER
+}
+
+enum CompanySize {
+  MICRO
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum CompanyVerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum RecruiterStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum RecruiterVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum CompanyContactType {
+  HR
+  RECRUITMENT
+  TECHNICAL
+  FINANCE
+  LEGAL
+  OTHER
+}
+
+enum CompanyDocumentType {
+  REGISTRATION_CERTIFICATE
+  COMPANY_PAN
+  GST_CERTIFICATE
+  AUTHORIZATION_LETTER
+  OTHER
+}
+
+enum DocumentVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 enum AuditEventType {
   LOGIN_SUCCESS
   LOGIN_FAILED
@@ -74,6 +142,29 @@ enum AuditEventType {
   SKILL_UPDATED
   RESUME_UPLOADED
   RESUME_DELETED
+  // Phase 4 Company & Recruiter Events
+  COMPANY_CREATED
+  COMPANY_UPDATED
+  COMPANY_DELETED
+  COMPANY_VERIFICATION_SUBMITTED
+  COMPANY_VERIFIED
+  COMPANY_REJECTED
+  COMPANY_SUSPENDED
+  COMPANY_ACTIVATED
+  RECRUITER_INVITED
+  RECRUITER_CREATED
+  RECRUITER_UPDATED
+  RECRUITER_VERIFIED
+  RECRUITER_SUSPENDED
+  RECRUITER_ACTIVATED
+  COMPANY_DOCUMENT_UPLOADED
+  COMPANY_DOCUMENT_VERIFIED
+  COMPANY_DOCUMENT_REJECTED
+  COMPANY_DOCUMENT_DELETED
+  COMPANY_CONTACT_CREATED
+  COMPANY_CONTACT_UPDATED
+  COMPANY_CONTACT_DELETED
+  COMPANY_PREFERENCES_UPDATED
 }
 
 model User {
@@ -100,6 +191,12 @@ model User {
   auditLogs               AuditLog[]
   studentProfile          StudentProfile?
   verifiedStudents        StudentProfile[]         @relation("VerifiedStudents")
+  recruiterProfile        RecruiterProfile?
+  verifiedCompanies       Company[]                @relation("VerifiedCompanies")
+  verifiedRecruiters      RecruiterProfile[]       @relation("VerifiedRecruiters")
+  invitedRecruiters       RecruiterInvitation[]    @relation("InvitedRecruiters")
+  uploadedCompanyDocs     CompanyDocument[]        @relation("UploadedCompanyDocs")
+  verifiedCompanyDocs     CompanyDocument[]        @relation("VerifiedCompanyDocs")
 
   @@index([email])
   @@index([role])
@@ -456,4 +553,155 @@ model Resume {
   @@index([studentProfileId])
   @@index([fileKey])
   @@index([isActive])
+}
+
+model Company {
+  id                 String                    @id @default(uuid())
+  name               String
+  legalName          String?
+  slug               String                    @unique
+  description        String?
+  industry           String
+  companyType        CompanyType               @default(ENTERPRISE)
+  website            String?
+  logoUrl            String?
+  headquarters       String?
+  foundedYear        Int?
+  companySize        CompanySize               @default(MEDIUM)
+  linkedinUrl        String?
+  contactEmail       String?
+  contactPhone       String?
+  status             CompanyStatus             @default(ACTIVE)
+  verificationStatus CompanyVerificationStatus @default(PENDING)
+  verificationNotes  String?
+  verifiedAt         DateTime?
+  verifiedById       String?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  deletedAt          DateTime?
+
+  verifiedBy       User?                     @relation("VerifiedCompanies", fields: [verifiedById], references: [id])
+  recruiters       RecruiterProfile[]
+  contacts         CompanyContact[]
+  documents        CompanyDocument[]
+  hiringPreference CompanyHiringPreference?
+  invitations      RecruiterInvitation[]
+
+  @@index([name])
+  @@index([slug])
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([industry])
+  @@index([deletedAt])
+}
+
+model RecruiterProfile {
+  id                 String                      @id @default(uuid())
+  userId             String                      @unique
+  companyId          String
+  designation        String?
+  department         String?
+  employeeId         String?
+  workEmail          String?
+  workPhone          String?
+  profilePhoto       String?
+  status             RecruiterStatus             @default(ACTIVE)
+  verificationStatus RecruiterVerificationStatus @default(PENDING)
+  verificationNotes  String?
+  verifiedAt         DateTime?
+  verifiedById       String?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  verifiedBy User?    @relation("VerifiedRecruiters", fields: [verifiedById], references: [id])
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([status])
+  @@index([verificationStatus])
+}
+
+model RecruiterInvitation {
+  id           String    @id @default(uuid())
+  companyId    String
+  email        String
+  tokenHash    String    @unique
+  role         Role      @default(RECRUITER)
+  designation  String?
+  invitedById  String
+  isAccepted   Boolean   @default(false)
+  acceptedAt   DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invitedBy User    @relation("InvitedRecruiters", fields: [invitedById], references: [id])
+
+  @@index([companyId])
+  @@index([email])
+  @@index([tokenHash])
+}
+
+model CompanyContact {
+  id          String             @id @default(uuid())
+  companyId   String
+  name        String
+  designation String?
+  email       String
+  phone       String?
+  contactType CompanyContactType @default(HR)
+  isPrimary   Boolean            @default(false)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([email])
+}
+
+model CompanyDocument {
+  id                 String                     @id @default(uuid())
+  companyId          String
+  documentType       CompanyDocumentType
+  fileReference      String
+  fileName           String
+  mimeType           String
+  fileSize           BigInt
+  uploadedById       String
+  verificationStatus DocumentVerificationStatus @default(PENDING)
+  verificationNotes  String?
+  verifiedAt         DateTime?
+  verifiedById       String?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  company    Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  uploadedBy User    @relation("UploadedCompanyDocs", fields: [uploadedById], references: [id])
+  verifiedBy User?   @relation("VerifiedCompanyDocs", fields: [verifiedById], references: [id])
+
+  @@index([companyId])
+  @@index([verificationStatus])
+}
+
+model CompanyHiringPreference {
+  id                       String           @id @default(uuid())
+  companyId                String           @unique
+  preferredDepartments     String[]
+  preferredDegrees         String[]
+  preferredSkills          String[]
+  preferredLocations       String[]
+  preferredWorkModes       WorkPreference[]
+  minimumCgpa              Float?
+  maximumBacklogs          Int?
+  preferredGraduationYears Int[]
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }

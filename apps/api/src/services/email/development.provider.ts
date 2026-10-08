@@ -4,9 +4,10 @@ import { env } from '../../config/env.js';
 
 export interface SentEmailRecord {
   toEmail: string;
-  type: 'verification' | 'password_reset';
+  type: 'verification' | 'password_reset' | 'recruiter_invitation';
   token: string;
-  firstName: string;
+  firstName?: string;
+  companyName?: string;
   url: string;
   sentAt: Date;
 }
@@ -49,6 +50,24 @@ export class DevelopmentEmailProvider implements IEmailService {
       type: 'password_reset',
       firstName,
       resetUrl: url,
+    });
+  }
+
+  async sendRecruiterInvitationEmail(toEmail: string, token: string, companyName: string, inviteUrl: string): Promise<void> {
+    const record: SentEmailRecord = {
+      toEmail,
+      type: 'recruiter_invitation',
+      token,
+      companyName,
+      url: inviteUrl,
+      sentAt: new Date(),
+    };
+    this.sentEmails.push(record);
+
+    logger.info(`[DEV EMAIL] Recruiter invitation email simulated for: ${toEmail}`, {
+      type: 'recruiter_invitation',
+      companyName,
+      invitationUrl: inviteUrl,
     });
   }
 

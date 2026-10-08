@@ -1,7 +1,8 @@
 # AI-Powered Campus Placement Intelligence & Management Platform
 
-[![Phase](https://img.shields.io/badge/Phase-1%20Foundation%20%26%20Infrastructure-emerald)](.)
+[![Phase](https://img.shields.io/badge/Phase-4%20Company%20%26%20Recruiter%20Management-emerald)](.)
 [![License](https://img.shields.io/badge/Cost-%E2%82%B90%20Mandatory%20Free-blue)](.)
+[![Tests](https://img.shields.io/badge/Tests-92%2F92%20Passing-brightgreen)](.)
 [![Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20React%20Native%20%7C%20Node.js%20%7C%20FastAPI%20%7C%20PostgreSQL-indigo)](.)
 
 An enterprise-grade, localized, zero-cost intelligence and management platform designed for college placement cells, students, and recruiters.
@@ -90,7 +91,8 @@ npm run db:seed
 | `PLACEMENT_ADMIN` | `placementadmin@campus.edu` | `Password123!` | Placement head, policies & drives |
 | `PLACEMENT_COORDINATOR`| `placementcoord@campus.edu`| `Password123!` | Operational drives & interviews |
 | `DEPARTMENT_COORDINATOR`| `deptcoord@campus.edu` | `Password123!` | Department-specific students & data |
-| `RECRUITER` | `recruiter@techcorp.com` | `Password123!` | Job postings & candidate applications |
+| `RECRUITER` | `recruiter@technova.com` | `Password123!` | TechNova Solutions recruiter account |
+| `RECRUITER` | `recruiter@cloudsphere.com` | `Password123!` | CloudSphere Technologies recruiter account |
 | `STUDENT` | `student@campus.edu` | `Password123!` | Profile, applications & offers |
 
 > **Security Note:** Seed credentials are strictly for local development and are blocked in production environments (`NODE_ENV === 'production'`).
@@ -103,8 +105,10 @@ npm run db:seed
 - **Phase 1 (Complete)**: Development Foundation & Core Infrastructure (Layered API, Python FastAPI ML service, Next.js Web Shell, Expo Mobile Shell, Shared Packages, Request IDs, Structured Logging, Health & Readiness Checks, Resilient Redis/DB Handling, Test Suites).
 - **Phase 2 (Complete)**: Authentication, Identity & Role-Based Access Control (Argon2id password security, database-backed sessions, refresh token rotation, token reuse detection, email verification & password reset abstractions, audit logging, protected web routes & role-aware mobile navigation).
 - **Phase 3 (Complete)**: Student & Academic Management (Strict User/StudentProfile domain separation, academic structure [College, Campus, Department, Degree, Batch], normalized skills taxonomy, student skills, projects, internships, certifications, career preferences, local resume upload abstraction & private download streams, deterministic profile completion engine, institution-controlled field protection & academic verification workflows, department-scoped coordinator authorization, rich student dashboard on web & mobile, admin student directory with search/filters/pagination).
-- **Phase 4**: Placement Drive Creation, Job Postings, and Deterministic Eligibility Engine.
-- **Phase 5**: Student Applications, Multi-Stage Selection Pipeline & Live Interview Scheduling.
-- **Phase 6**: Offers, Placement Policies ("One Student One Job"), and Realtime Notifications.
-- **Phase 7**: Local-First AI Resume Parsing, Semantic Job Matching & Placement Readiness Prediction.
-- **Phase 8**: Analytics Dashboards, Audit Logs, and Mobile Polish.
+- **Phase 4 (Complete)**: Company & Recruiter Management (Companies, Profiles, Multi-recruiter relationships, Invitations, Contacts, Documents, Logos, Hiring Preferences, Verification & Status workflows, Object-level RBAC, Web Recruiter Dashboard & Workspace, Web Admin Company Directory, Mobile Recruiter Hub, Audit Logging).
+- **Phase 5**: Placement Drive Creation, Job Postings, and Deterministic Eligibility Engine.
+- **Phase 6**: Student Applications, Multi-Stage Selection Pipeline & Live Interview Scheduling.
+- **Phase 7**: Offers, Placement Policies ("One Student One Job"), and Realtime Notifications.
+- **Phase 8**: Local-First AI Resume Parsing, Semantic Job Matching & Placement Readiness Prediction.
+- **Phase 9**: Analytics Dashboards, Audit Logs, and Mobile Polish.
+

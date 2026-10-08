@@ -6,13 +6,22 @@ import {
   AcademicVerificationStatus,
   SkillProficiency,
   WorkPreference,
+  CompanyType,
+  CompanySize,
+  CompanyStatus,
+  CompanyVerificationStatus,
+  RecruiterStatus,
+  RecruiterVerificationStatus,
+  CompanyContactType,
+  CompanyDocumentType,
+  DocumentVerificationStatus,
 } from '@prisma/client';
 import argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting comprehensive development database seed for Phase 3...');
+  console.log('🌱 Starting comprehensive development database seed for Phase 4...');
 
   if (process.env.NODE_ENV === 'production') {
     throw new Error('❌ Refusing to run dev seed script in production!');
@@ -462,6 +471,336 @@ async function main() {
   }
 
   console.log(`  ✓ Seeded ${rawStudents.length} comprehensive student profiles with skills, projects, preferences, and resumes.`);
+
+  // ================= 9. PHASE 4 COMPANIES & RECRUITERS =================
+  console.log('  🏢 Seeding Phase 4 Companies, Recruiters, and Corporate Governance...');
+
+  const companiesData = [
+    {
+      name: 'TechNova Solutions',
+      legalName: 'TechNova Solutions Private Limited',
+      slug: 'technova-solutions',
+      description: 'Global IT consulting, cloud engineering, and enterprise architecture partner.',
+      industry: 'IT Services & Cloud Computing',
+      companyType: CompanyType.ENTERPRISE,
+      companySize: CompanySize.LARGE,
+      headquarters: 'Bengaluru, Karnataka, India',
+      foundedYear: 2011,
+      website: 'https://technova.example.com',
+      contactEmail: 'campus.relations@technova.example.com',
+      contactPhone: '+91 80 4411 2233',
+      status: CompanyStatus.ACTIVE,
+      verificationStatus: CompanyVerificationStatus.VERIFIED,
+      recruiter: {
+        email: 'recruiter.technova@campus.edu',
+        firstName: 'Neha',
+        lastName: 'Sharma',
+        designation: 'Lead Campus Recruiter',
+        department: 'University Talent Acquisition',
+      },
+      contacts: [
+        { name: 'Priya Verma', designation: 'Director of HR', email: 'priya.v@technova.example.com', contactType: CompanyContactType.HR, isPrimary: true },
+        { name: 'Rajesh Rao', designation: 'Technical Architect', email: 'rajesh.r@technova.example.com', contactType: CompanyContactType.TECHNICAL, isPrimary: false },
+      ],
+      preferences: {
+        minimumCgpa: 7.5,
+        maximumBacklogs: 0,
+        preferredWorkModes: [WorkPreference.HYBRID, WorkPreference.ONSITE],
+        preferredDepartments: ['CSE', 'ECE'],
+        preferredDegrees: ['B.Tech', 'M.Tech'],
+        preferredGraduationYears: [2026, 2027],
+      },
+      documents: [
+        { type: CompanyDocumentType.REGISTRATION_CERTIFICATE, name: 'TechNova_Incorporation_Cert.pdf', status: DocumentVerificationStatus.VERIFIED },
+        { type: CompanyDocumentType.GST_CERTIFICATE, name: 'TechNova_GST_Filing.pdf', status: DocumentVerificationStatus.VERIFIED },
+      ],
+    },
+    {
+      name: 'CloudSphere Technologies',
+      legalName: 'CloudSphere Systems Inc.',
+      slug: 'cloudsphere-technologies',
+      description: 'Hyper-scale cloud management platforms, multi-tenant Kubernetes and SRE solutions.',
+      industry: 'Cloud Infrastructure & DevOps',
+      companyType: CompanyType.MNC,
+      companySize: CompanySize.ENTERPRISE,
+      headquarters: 'Hyderabad, Telangana, India',
+      foundedYear: 2016,
+      website: 'https://cloudsphere.example.com',
+      contactEmail: 'talent@cloudsphere.example.com',
+      contactPhone: '+91 40 6677 8899',
+      status: CompanyStatus.ACTIVE,
+      verificationStatus: CompanyVerificationStatus.VERIFIED,
+      recruiter: {
+        email: 'recruiter.cloudsphere@campus.edu',
+        firstName: 'Vikram',
+        lastName: 'Mehta',
+        designation: 'Senior Technical Recruiter',
+        department: 'Cloud Systems Hiring',
+      },
+      contacts: [
+        { name: 'Anita Desai', designation: 'Head of Recruiting', email: 'anita.d@cloudsphere.example.com', contactType: CompanyContactType.RECRUITMENT, isPrimary: true },
+      ],
+      preferences: {
+        minimumCgpa: 8.0,
+        maximumBacklogs: 0,
+        preferredWorkModes: [WorkPreference.REMOTE, WorkPreference.HYBRID],
+        preferredDepartments: ['CSE'],
+        preferredDegrees: ['B.Tech'],
+        preferredGraduationYears: [2026],
+      },
+      documents: [
+        { type: CompanyDocumentType.REGISTRATION_CERTIFICATE, name: 'CloudSphere_Registration.pdf', status: DocumentVerificationStatus.VERIFIED },
+      ],
+    },
+    {
+      name: 'DataForge Labs',
+      legalName: 'DataForge AI Analytics LLP',
+      slug: 'dataforge-labs',
+      description: 'Specialized deep learning and high-throughput real-time stream analytics for fintech.',
+      industry: 'Artificial Intelligence & Data Engineering',
+      companyType: CompanyType.STARTUP,
+      companySize: CompanySize.MEDIUM,
+      headquarters: 'Pune, Maharashtra, India',
+      foundedYear: 2021,
+      website: 'https://dataforge.example.com',
+      contactEmail: 'careers@dataforge.example.com',
+      status: CompanyStatus.ACTIVE,
+      verificationStatus: CompanyVerificationStatus.PENDING,
+      recruiter: {
+        email: 'recruiter.dataforge@campus.edu',
+        firstName: 'Siddharth',
+        lastName: 'Joshi',
+        designation: 'Founding Talent Partner',
+        department: 'Engineering Hiring',
+      },
+      contacts: [
+        { name: 'Siddharth Joshi', designation: 'VP People', email: 'siddharth@dataforge.example.com', contactType: CompanyContactType.RECRUITMENT, isPrimary: true },
+      ],
+      preferences: {
+        minimumCgpa: 7.0,
+        maximumBacklogs: 1,
+        preferredWorkModes: [WorkPreference.HYBRID],
+        preferredDepartments: ['CSE', 'EEE'],
+        preferredDegrees: ['B.Tech', 'M.Tech'],
+        preferredGraduationYears: [2026, 2027],
+      },
+      documents: [
+        { type: CompanyDocumentType.COMPANY_PAN, name: 'DataForge_PAN_Card.pdf', status: DocumentVerificationStatus.PENDING },
+      ],
+    },
+    {
+      name: 'InnoSoft Systems',
+      legalName: 'InnoSoft Global Solutions',
+      slug: 'innosoft-systems',
+      description: 'Enterprise resource planning and modern microservices architecture development.',
+      industry: 'Enterprise Software & SaaS',
+      companyType: CompanyType.MEDIUM_BUSINESS,
+      companySize: CompanySize.MEDIUM,
+      headquarters: 'Chennai, Tamil Nadu, India',
+      foundedYear: 2018,
+      website: 'https://innosoft.example.com',
+      contactEmail: 'hr@innosoft.example.com',
+      status: CompanyStatus.ACTIVE,
+      verificationStatus: CompanyVerificationStatus.VERIFIED,
+      contacts: [
+        { name: 'Kavita Nair', designation: 'Talent Acquisition Manager', email: 'kavita.n@innosoft.example.com', contactType: CompanyContactType.HR, isPrimary: true },
+      ],
+      preferences: {
+        minimumCgpa: 6.5,
+        maximumBacklogs: 2,
+        preferredWorkModes: [WorkPreference.ONSITE],
+        preferredDepartments: ['CSE', 'ECE', 'MECH'],
+        preferredDegrees: ['B.Tech', 'MCA'],
+        preferredGraduationYears: [2026],
+      },
+      documents: [],
+    },
+    {
+      name: 'GreenByte Technologies',
+      legalName: 'GreenByte CleanTech Innovations',
+      slug: 'greenbyte-technologies',
+      description: 'Smart grid monitoring, IoT sensor networks, and carbon footprint telemetry platforms.',
+      industry: 'CleanTech & IoT',
+      companyType: CompanyType.STARTUP,
+      companySize: CompanySize.SMALL,
+      headquarters: 'Bengaluru, Karnataka, India',
+      foundedYear: 2023,
+      website: 'https://greenbyte.example.com',
+      contactEmail: 'hello@greenbyte.example.com',
+      status: CompanyStatus.ACTIVE,
+      verificationStatus: CompanyVerificationStatus.UNDER_REVIEW,
+      contacts: [
+        { name: 'Arjun Das', designation: 'Co-Founder & CTO', email: 'arjun@greenbyte.example.com', contactType: CompanyContactType.TECHNICAL, isPrimary: true },
+      ],
+      documents: [
+        { type: CompanyDocumentType.AUTHORIZATION_LETTER, name: 'GreenByte_Auth_Letter.pdf', status: DocumentVerificationStatus.PENDING },
+      ],
+    },
+    {
+      name: 'Apex Quantum Dynamics',
+      legalName: 'Apex Quantum Dynamics R&D',
+      slug: 'apex-quantum-dynamics',
+      description: 'Experimental quantum circuit emulation and cryogenic hardware algorithms.',
+      industry: 'Quantum Computing & Advanced R&D',
+      companyType: CompanyType.ENTERPRISE,
+      companySize: CompanySize.LARGE,
+      headquarters: 'Mumbai, Maharashtra, India',
+      foundedYear: 2020,
+      website: 'https://apexquantum.example.com',
+      status: CompanyStatus.SUSPENDED,
+      verificationStatus: CompanyVerificationStatus.REJECTED,
+      contacts: [],
+      documents: [],
+    },
+  ];
+
+  for (const cData of companiesData) {
+    const company = await prisma.company.upsert({
+      where: { slug: cData.slug },
+      update: {
+        name: cData.name,
+        legalName: cData.legalName,
+        industry: cData.industry,
+        companyType: cData.companyType,
+        companySize: cData.companySize,
+        headquarters: cData.headquarters,
+        foundedYear: cData.foundedYear,
+        website: cData.website,
+        contactEmail: cData.contactEmail,
+        contactPhone: cData.contactPhone,
+        status: cData.status,
+        verificationStatus: cData.verificationStatus,
+      },
+      create: {
+        name: cData.name,
+        legalName: cData.legalName,
+        slug: cData.slug,
+        description: cData.description,
+        industry: cData.industry,
+        companyType: cData.companyType,
+        companySize: cData.companySize,
+        headquarters: cData.headquarters,
+        foundedYear: cData.foundedYear,
+        website: cData.website,
+        contactEmail: cData.contactEmail,
+        contactPhone: cData.contactPhone,
+        status: cData.status,
+        verificationStatus: cData.verificationStatus,
+        verifiedById: cData.verificationStatus === CompanyVerificationStatus.VERIFIED ? superAdmin.id : undefined,
+        verifiedAt: cData.verificationStatus === CompanyVerificationStatus.VERIFIED ? new Date() : undefined,
+      },
+    });
+
+    // Seed Recruiter Account if present
+    if (cData.recruiter) {
+      const recUser = await prisma.user.upsert({
+        where: { email: cData.recruiter.email },
+        update: {
+          role: Role.RECRUITER,
+          status: UserStatus.ACTIVE,
+          companyId: company.id,
+        },
+        create: {
+          email: cData.recruiter.email,
+          passwordHash,
+          firstName: cData.recruiter.firstName,
+          lastName: cData.recruiter.lastName,
+          role: Role.RECRUITER,
+          status: UserStatus.ACTIVE,
+          emailVerified: true,
+          companyId: company.id,
+        },
+      });
+
+      await prisma.recruiterProfile.upsert({
+        where: { userId: recUser.id },
+        update: {
+          companyId: company.id,
+          designation: cData.recruiter.designation,
+          department: cData.recruiter.department,
+        },
+        create: {
+          userId: recUser.id,
+          companyId: company.id,
+          designation: cData.recruiter.designation,
+          department: cData.recruiter.department,
+          workEmail: cData.recruiter.email,
+          status: RecruiterStatus.ACTIVE,
+          verificationStatus: RecruiterVerificationStatus.VERIFIED,
+          verifiedById: superAdmin.id,
+          verifiedAt: new Date(),
+        },
+      });
+    }
+
+    // Seed Contacts
+    for (const ct of cData.contacts) {
+      const existing = await prisma.companyContact.findFirst({
+        where: { companyId: company.id, email: ct.email },
+      });
+      if (!existing) {
+        await prisma.companyContact.create({
+          data: {
+            companyId: company.id,
+            name: ct.name,
+            designation: ct.designation,
+            email: ct.email,
+            contactType: ct.contactType,
+            isPrimary: ct.isPrimary,
+          },
+        });
+      }
+    }
+
+    // Seed Preferences
+    if (cData.preferences) {
+      await prisma.companyHiringPreference.upsert({
+        where: { companyId: company.id },
+        update: {
+          minimumCgpa: cData.preferences.minimumCgpa,
+          maximumBacklogs: cData.preferences.maximumBacklogs,
+          preferredWorkModes: cData.preferences.preferredWorkModes,
+          preferredDepartments: cData.preferences.preferredDepartments,
+          preferredDegrees: cData.preferences.preferredDegrees,
+          preferredGraduationYears: cData.preferences.preferredGraduationYears,
+        },
+        create: {
+          companyId: company.id,
+          minimumCgpa: cData.preferences.minimumCgpa,
+          maximumBacklogs: cData.preferences.maximumBacklogs,
+          preferredWorkModes: cData.preferences.preferredWorkModes,
+          preferredDepartments: cData.preferences.preferredDepartments,
+          preferredDegrees: cData.preferences.preferredDegrees,
+          preferredGraduationYears: cData.preferences.preferredGraduationYears,
+        },
+      });
+    }
+
+    // Seed Documents
+    for (const doc of cData.documents) {
+      const existingDoc = await prisma.companyDocument.findFirst({
+        where: { companyId: company.id, fileName: doc.name },
+      });
+      if (!existingDoc) {
+        await prisma.companyDocument.create({
+          data: {
+            companyId: company.id,
+            uploadedById: superAdmin.id,
+            documentType: doc.type,
+            fileReference: `company-docs/${company.slug}_${doc.name}`,
+            fileName: doc.name,
+            mimeType: 'application/pdf',
+            fileSize: BigInt(512000),
+            verificationStatus: doc.status,
+            verifiedById: doc.status === DocumentVerificationStatus.VERIFIED ? superAdmin.id : undefined,
+            verifiedAt: doc.status === DocumentVerificationStatus.VERIFIED ? new Date() : undefined,
+          },
+        });
+      }
+    }
+  }
+
+  console.log(`  ✓ Seeded ${companiesData.length} companies with recruiters, contacts, hiring preferences, and compliance documents.`);
   console.log('✅ Development database seed completed successfully!');
 }
 
