@@ -9,6 +9,7 @@ describe('Auth & Permission Architecture', () => {
       userId: '11111111-1111-1111-1111-111111111111',
       email: 'student@campus.edu',
       role: UserRole.STUDENT,
+      sessionId: 'test-session-12345',
     };
 
     const token = signAccessToken(payload);

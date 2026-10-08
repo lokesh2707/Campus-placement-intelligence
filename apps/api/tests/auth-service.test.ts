@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AuthService } from '../src/services/auth.service.js';
-import { UserRole } from '@campus-os/shared-types';
-import { UserStatus, Role, AuditEventType } from '@prisma/client';
+import { UserRole, UserStatus, AuditEventType } from '@campus-os/shared-types';
 import { hashPassword } from '../src/utils/password.js';
 import { hashToken } from '../src/utils/crypto.js';
 import { emailService } from '../src/services/email/index.js';
